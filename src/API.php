@@ -98,6 +98,8 @@ class API {
 	 */
 	static function getImageSize($url, $size)
 	{
+		return $size . "/" . $url;
+		
 		$name = explode('.', $url);
 		array_pop($name);
 		return implode('.', $name) .'-'. $size .'.'. pathinfo($url, PATHINFO_EXTENSION);
