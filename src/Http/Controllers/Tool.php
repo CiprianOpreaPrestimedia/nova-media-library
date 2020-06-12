@@ -99,7 +99,8 @@ class Tool {
 				if ( $sizes ) {
 					foreach ($sizes as $size) {
 						$name = explode('.', $key->name);
-						$array[] = Helper::folder($key->folder . implode('-'. $size .'.', $name));
+
+						$array[] = Helper::folder($key->folder . "/". $size . "/" .$key->name);
 					}
 				}
 			}
@@ -128,14 +129,24 @@ class Tool {
 		}
 
 		$folder = request('folder');
-		if ( $folder and 'folders' === config('nova-media-library.store') and $folder !== $item->folder ) {
+		if ( request('title') || ($folder and 'folders' === config('nova-media-library.store') and $folder !== $item->folder)  ) {
+			$folder = $folder ?: $item->folder;
+
+			$title = $item->name;
+
+			if(request('title'))
+			{
+				$title = str_replace($item->getOriginal('title'), request('title'), $item->name);
+			}
+
 			$private = Helper::isPrivate($folder);
-			$array = [ [$item->path, Helper::folder($folder . $item->name)] ];
+			$array = [ [$item->path, Helper::folder($folder . $title)] ];
 
 			foreach ($img_sizes as $key) {
 				$name = API::getImageSize($item->name, $key);
-				$array[] = [Helper::folder($item->folder . $name), Helper::folder($folder . $name)];
-			}
+				$size_title = API::getImageSize($title, $key);
+				$array[] = [Helper::folder($item->folder . $name), Helper::folder($folder . $size_title)];
+			}	
 
 			foreach ($array as $key) {
 				Helper::storage()->move($key[0], $key[1]);
@@ -146,6 +157,11 @@ class Tool {
 			$item->private = $private;
 			$item->folder = Helper::replace('/'. $folder .'/');
 			$item->lp = Helper::localPublic($item->folder, $private);
+
+			if(request('title'))
+			{
+				$item->name = $title;
+			}
 		}
 
 		$item->save();
