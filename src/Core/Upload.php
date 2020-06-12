@@ -28,7 +28,7 @@ class Upload {
 		$this->extension = strtolower($file->getClientOriginalExtension());
 
 		$this->title = data_get(pathinfo($file->getClientOriginalName()), 'filename', Str::random());
-		$this->name = Str::slug($this->title) .'-'. time() . Str::random(5) .'.'. $this->extension;
+		$this->name = $file->getClientOriginalName();
 		$this->options['mime'] = explode('/', $file->getMimeType())[0];
 	}
 
