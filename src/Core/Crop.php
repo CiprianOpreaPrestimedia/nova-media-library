@@ -116,7 +116,7 @@ class Crop {
 
 				if (
 					Helper::storage()->put(
-						Helper::folder($item->folder . $name . $size . $ext),
+						Helper::folder($item->folder . "/" . $size .  "/" . $item->name),
 						$img,
 						Helper::visibility($item->private)
 					)
